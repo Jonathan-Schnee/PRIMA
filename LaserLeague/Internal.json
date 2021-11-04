@@ -333,12 +333,11 @@
             }
           }
         ],
-        "LaserRotator": [
+        "Laser": [
           {
-            "Script.LaserRotator": {
+            "Script.Laser": {
               "active": true,
-              "message": "LaserRotator added to ",
-              "rotationSpeed": 90
+              "message": "Laser added to "
             }
           }
         ]

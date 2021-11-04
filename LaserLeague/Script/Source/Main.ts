@@ -16,7 +16,7 @@ namespace Script {
 
   async function start(_event: CustomEvent): Promise<void> {
     viewport = _event.detail;
-    
+
 
 
     let graph: ƒ.Node = viewport.getBranch();
@@ -29,12 +29,12 @@ namespace Script {
 
     let graphLaser: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:07:23.830Z|93008"];
 
-    for(var i = 0; i < 2; i++){
-      for(var j = 0; j < 3; j++){
+    for (var i = 0; i < 2; i++) {
+      for (var j = 0; j < 3; j++) {
         let laserarr = await ƒ.Project.createGraphInstance(graphLaser)
         graph.getChildrenByName("Laserformation")[0].addChild(laserarr);
-        laserarr.mtxLocal.translateY(-5 + i* 6);
-        laserarr.mtxLocal.translateX(-11 + j* 6);
+        laserarr.mtxLocal.translateY(-5 + i * 6);
+        laserarr.mtxLocal.translateX(-11 + j * 6);
       }
     }
 
@@ -62,19 +62,9 @@ namespace Script {
     agent.mtxLocal.rotateZ(ctrRotate.getOutput())
     // ƒ.Physics.world.simulate();  // if physics is included and used
     viewport.draw();
-    checkCollision();
+    //console.log(Laser.collision(agent, laserformation))
+    if (Laser.collision(agent, laserformation))
+      console.log("hit");
     ƒ.AudioManager.default.update();
   }
-
-  function checkCollision(): void {
-    for(let las of laserformation.getChildren()){
-      let arms: ƒ.Node = las.getChildrenByName("Arms")[0]
-      for(let beam of arms.getChildren()){
-        let posLocal1: ƒ.Vector3 = ƒ.Vector3.TRANSFORMATION(agent.mtxWorld.translation, beam.mtxWorldInverse, true);
-        if(posLocal1.x <= 2.8 && posLocal1.x >= 0 && posLocal1.y <= 0.25 && posLocal1.y >= -0.25)
-          console.log("hit");
-      }
-    }
-  }
-
 }

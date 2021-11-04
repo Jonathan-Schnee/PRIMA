@@ -18,48 +18,6 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
-    class CollisionDetection extends ƒ.ComponentScript {
-        // Register the script as component for use in the editor via drag&drop
-        static iSubclass = ƒ.Component.registerSubclass(Script.LaserRotator);
-        // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "CollisionDetection added to ";
-        viewport;
-        gameObject;
-        rotationTransform;
-        constructor() {
-            super();
-            // Don't start when running in editor
-            if (ƒ.Project.mode == ƒ.MODE.EDITOR)
-                return;
-            // Listen to this component being added to or removed from a node
-            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-        }
-        // Activate the functions of this component as response to events
-        hndEvent = (_event) => {
-            switch (_event.type) {
-                case "componentAdd" /* COMPONENT_ADD */:
-                    ƒ.Debug.log(this.message, this.node);
-                    this.start();
-                    break;
-                case "componentRemove" /* COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-                    break;
-            }
-        };
-        start() {
-            ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
-        }
-        update = (_event) => {
-        };
-    }
-    Script.CollisionDetection = CollisionDetection;
-})(Script || (Script = {}));
-var Script;
-(function (Script) {
-    var ƒ = FudgeCore;
-    ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
     class CustomComponentScript extends ƒ.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
         static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
@@ -93,18 +51,19 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
-    class LaserRotator extends ƒ.ComponentScript {
+    class Laser extends ƒ.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
-        static iSubclass = ƒ.Component.registerSubclass(LaserRotator);
+        static iSubclass = ƒ.Component.registerSubclass(Laser);
         // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "LaserRotator added to ";
+        message = "Laser added to ";
         viewport;
-        rotationSpeed = 90;
+        rotationSpeed;
         deltaTime;
         gameObject;
         rotationTransform;
         constructor() {
             super();
+            this.rotationSpeed = 90;
             // Don't start when running in editor
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
@@ -132,8 +91,20 @@ var Script;
             this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
             this.node.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
         };
+        static collision(agent, laserformation) {
+            let col = false;
+            for (let las of laserformation.getChildren()) {
+                let arms = las.getChildrenByName("Arms")[0];
+                for (let beam of arms.getChildren()) {
+                    let posLocal1 = ƒ.Vector3.TRANSFORMATION(agent.mtxWorld.translation, beam.mtxWorldInverse, true);
+                    if (posLocal1.x <= 2.8 && posLocal1.x >= 0 && posLocal1.y <= 0.25 && posLocal1.y >= -0.25)
+                        col = true;
+                }
+            }
+            return col;
+        }
     }
-    Script.LaserRotator = LaserRotator;
+    Script.Laser = Laser;
 })(Script || (Script = {}));
 var Script;
 (function (Script) {
@@ -179,18 +150,10 @@ var Script;
         agent.mtxLocal.rotateZ(ctrRotate.getOutput());
         // ƒ.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
-        checkCollision();
+        //console.log(Laser.collision(agent, laserformation))
+        if (Script.Laser.collision(agent, laserformation))
+            console.log("hit");
         ƒ.AudioManager.default.update();
-    }
-    function checkCollision() {
-        for (let las of laserformation.getChildren()) {
-            let arms = las.getChildrenByName("Arms")[0];
-            for (let beam of arms.getChildren()) {
-                let posLocal1 = ƒ.Vector3.TRANSFORMATION(agent.mtxWorld.translation, beam.mtxWorldInverse, true);
-                if (posLocal1.x <= 2.8 && posLocal1.x >= 0 && posLocal1.y <= 0.25 && posLocal1.y >= -0.25)
-                    console.log("hit");
-            }
-        }
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map

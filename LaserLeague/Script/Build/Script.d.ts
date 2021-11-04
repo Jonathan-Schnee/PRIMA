@@ -6,20 +6,6 @@ declare namespace Script {
 }
 declare namespace Script {
     import ƒ = FudgeCore;
-    class CollisionDetection extends ƒ.ComponentScript {
-        static readonly iSubclass: number;
-        message: string;
-        viewport: ƒ.Viewport;
-        gameObject: ƒ.Node;
-        rotationTransform: ƒ.ComponentTransform;
-        constructor();
-        hndEvent: (_event: Event) => void;
-        start(): void;
-        update: (_event: Event) => void;
-    }
-}
-declare namespace Script {
-    import ƒ = FudgeCore;
     class CustomComponentScript extends ƒ.ComponentScript {
         static readonly iSubclass: number;
         message: string;
@@ -29,7 +15,7 @@ declare namespace Script {
 }
 declare namespace Script {
     import ƒ = FudgeCore;
-    class LaserRotator extends ƒ.ComponentScript {
+    class Laser extends ƒ.ComponentScript {
         static readonly iSubclass: number;
         message: string;
         viewport: ƒ.Viewport;
@@ -41,6 +27,7 @@ declare namespace Script {
         hndEvent: (_event: Event) => void;
         start(): void;
         update: (_event: Event) => void;
+        static collision(agent: Agent, laserformation: ƒ.Node): boolean;
     }
 }
 declare namespace Script {
