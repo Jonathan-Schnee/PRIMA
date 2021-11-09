@@ -27,6 +27,7 @@ declare namespace Script {
     export class Hud {
         private static controller;
         static start(): void;
+        static changeCSS(keyvalue: string): HTMLDivElement;
     }
     export {};
 }

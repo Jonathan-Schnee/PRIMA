@@ -13,6 +13,8 @@ var Script;
             this.mtxLocal.translateZ(0.5);
             this.getComponent(ƒ.ComponentMesh).mtxPivot.scale(ƒ.Vector3.ONE(0.5));
             Script.gameState.name = this.name;
+            let css = Script.Hud.changeCSS("name");
+            css.style.width = this.name.length - 1 + "ch";
         }
         health() {
             Script.gameState.health = this.healthvalue;
@@ -69,6 +71,10 @@ var Script;
             let domHud = document.querySelector("div");
             Hud.controller = new ƒui.Controller(Script.gameState, domHud);
             Hud.controller.updateUserInterface();
+        }
+        static changeCSS(keyvalue) {
+            let domHud = document.querySelector("input[key='" + keyvalue + "']");
+            return domHud;
         }
     }
     Script.Hud = Hud;

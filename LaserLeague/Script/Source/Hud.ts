@@ -18,5 +18,11 @@ namespace Script {
       Hud.controller = new ƒui.Controller(gameState, domHud);
       Hud.controller.updateUserInterface();
     }
+
+    public static changeCSS(keyvalue:string): HTMLDivElement {
+      let domHud: HTMLDivElement = document.querySelector("input[key='"+keyvalue+"']");
+      return domHud;
+    }
+
   }
 }

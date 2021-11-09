@@ -24,7 +24,11 @@ div {
 }
 
 input{
-  font-size: 1em;
   background-color: transparent;
   border: none;
 }
+
+input[key="name"]{
+  width: 0ch;
+}
+
