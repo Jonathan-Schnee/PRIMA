@@ -24,7 +24,7 @@ namespace Script {
 
     agent = new Agent();
     graph.getChildrenByName("Agents")[0].addChild(agent);
-    //agent = graph.getChildrenByName("Agents")[0].getChildren()[0];
+
     viewport.camera.mtxPivot.translateZ(-16);
 
     let graphLaser: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:07:23.830Z|93008"];
@@ -39,10 +39,10 @@ namespace Script {
     }
 
 
-
+    Hud.start();
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
-    ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+    ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
   function update(_event: Event): void {
     let deltaTime: number = ƒ.Loop.timeFrameReal / 1000
@@ -66,5 +66,9 @@ namespace Script {
     if (Laser.collision(agent, laserformation))
       console.log("hit");
     ƒ.AudioManager.default.update();
+
+    
+    agent.healthvalue -= 0.01;
+    agent.health();
   }
 }

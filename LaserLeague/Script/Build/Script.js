@@ -3,6 +3,8 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     class Agent extends ƒ.Node {
+        healthvalue = 1;
+        name = "Agent Smith";
         constructor() {
             super("Agent");
             this.addComponent(new ƒ.ComponentTransform);
@@ -10,6 +12,10 @@ var Script;
             this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("MaterialAgent", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(1, 0, 1, 1)))));
             this.mtxLocal.translateZ(0.5);
             this.getComponent(ƒ.ComponentMesh).mtxPivot.scale(ƒ.Vector3.ONE(0.5));
+            Script.gameState.name = this.name;
+        }
+        health() {
+            Script.gameState.health = this.healthvalue;
         }
     }
     Script.Agent = Agent;
@@ -46,6 +52,26 @@ var Script;
         };
     }
     Script.CustomComponentScript = CustomComponentScript;
+})(Script || (Script = {}));
+var Script;
+(function (Script) {
+    var ƒ = FudgeCore;
+    var ƒui = FudgeUserInterface;
+    class GameState extends ƒ.Mutable {
+        name = "";
+        health = 1;
+        reduceMutator(_mutator) { }
+    }
+    Script.gameState = new GameState();
+    class Hud {
+        static controller;
+        static start() {
+            let domHud = document.querySelector("div");
+            Hud.controller = new ƒui.Controller(Script.gameState, domHud);
+            Hud.controller.updateUserInterface();
+        }
+    }
+    Script.Hud = Hud;
 })(Script || (Script = {}));
 var Script;
 (function (Script) {
@@ -124,7 +150,6 @@ var Script;
         laserformation = graph.getChildrenByName("Laserformation")[0];
         agent = new Script.Agent();
         graph.getChildrenByName("Agents")[0].addChild(agent);
-        //agent = graph.getChildrenByName("Agents")[0].getChildren()[0];
         viewport.camera.mtxPivot.translateZ(-16);
         let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:07:23.830Z|93008"];
         for (var i = 0; i < 2; i++) {
@@ -135,8 +160,9 @@ var Script;
                 laserarr.mtxLocal.translateX(-11 + j * 6);
             }
         }
+        Script.Hud.start();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+        ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         let deltaTime = ƒ.Loop.timeFrameReal / 1000;
@@ -154,6 +180,8 @@ var Script;
         if (Script.Laser.collision(agent, laserformation))
             console.log("hit");
         ƒ.AudioManager.default.update();
+        agent.healthvalue -= 0.01;
+        agent.health();
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map

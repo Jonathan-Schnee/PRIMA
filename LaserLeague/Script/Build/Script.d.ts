@@ -1,7 +1,10 @@
 declare namespace Script {
     import ƒ = FudgeCore;
     class Agent extends ƒ.Node {
+        healthvalue: number;
+        name: string;
         constructor();
+        health(): void;
     }
 }
 declare namespace Script {
@@ -12,6 +15,20 @@ declare namespace Script {
         constructor();
         hndEvent: (_event: Event) => void;
     }
+}
+declare namespace Script {
+    import ƒ = FudgeCore;
+    class GameState extends ƒ.Mutable {
+        name: string;
+        health: number;
+        protected reduceMutator(_mutator: ƒ.Mutator): void;
+    }
+    export let gameState: GameState;
+    export class Hud {
+        private static controller;
+        static start(): void;
+    }
+    export {};
 }
 declare namespace Script {
     import ƒ = FudgeCore;

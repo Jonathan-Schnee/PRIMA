@@ -1,4 +1,4 @@
-/// <reference path="../../Physics/OIMOPhysics.d.ts" />
+/// <reference path="../../Core/Build/FudgeCore.d.ts" />
 declare namespace FudgeCore {
     /**
      * Base class for the different DebugTargets, mainly for technical purpose of inheritance
