@@ -5,6 +5,7 @@ var Script;
     class Agent extends ƒ.Node {
         healthvalue = 1;
         name = "Agent Smith";
+        cmpAudio;
         constructor() {
             super("Agent");
             this.addComponent(new ƒ.ComponentTransform);
@@ -15,9 +16,20 @@ var Script;
             Script.gameState.name = this.name;
             let css = Script.Hud.changeCSS("name");
             css.style.width = this.name.length - 1 + "ch";
+            const audio = new ƒ.Audio("Sound/trancyvania.mp3");
+            this.cmpAudio = new ƒ.ComponentAudio(audio, true);
+            this.cmpAudio.volume = 0.1;
+            this.addComponent(this.cmpAudio);
+            this.addComponent(new ƒ.ComponentAudioListener());
         }
         health() {
             Script.gameState.health = this.healthvalue;
+        }
+        playMusic() {
+            if (this.cmpAudio.isPlaying)
+                this.cmpAudio.play(false);
+            else
+                this.cmpAudio.play(true);
         }
     }
     Script.Agent = Agent;
@@ -157,6 +169,7 @@ var Script;
         agent = new Script.Agent();
         graph.getChildrenByName("Agents")[0].addChild(agent);
         viewport.camera.mtxPivot.translateZ(-16);
+        graph.addComponent(new ƒ.ComponentAudioListener());
         let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:07:23.830Z|93008"];
         for (var i = 0; i < 2; i++) {
             for (var j = 0; j < 3; j++) {
@@ -178,6 +191,8 @@ var Script;
         agent.mtxLocal.translateY(ctrForward.getOutput());
         let rotValue = (ƒ.Keyboard.mapToValue(1, 0, [ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])
             + ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ENTER]))
+            agent.playMusic();
         ctrRotate.setInput(rotValue * deltaTime);
         agent.mtxLocal.rotateZ(ctrRotate.getOutput());
         // ƒ.Physics.world.simulate();  // if physics is included and used

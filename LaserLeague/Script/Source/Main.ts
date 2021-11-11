@@ -26,6 +26,7 @@ namespace Script {
     graph.getChildrenByName("Agents")[0].addChild(agent);
 
     viewport.camera.mtxPivot.translateZ(-16);
+    graph.addComponent(new ƒ.ComponentAudioListener());
 
     let graphLaser: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:07:23.830Z|93008"];
 
@@ -58,6 +59,10 @@ namespace Script {
       ƒ.Keyboard.mapToValue(1, 0, [ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])
       + ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])
     );
+
+      if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ENTER]))
+        agent.playMusic();
+
     ctrRotate.setInput(rotValue * deltaTime)
     agent.mtxLocal.rotateZ(ctrRotate.getOutput())
     // ƒ.Physics.world.simulate();  // if physics is included and used

@@ -3,8 +3,10 @@ declare namespace Script {
     class Agent extends ƒ.Node {
         healthvalue: number;
         name: string;
+        private cmpAudio;
         constructor();
         health(): void;
+        playMusic(): void;
     }
 }
 declare namespace Script {

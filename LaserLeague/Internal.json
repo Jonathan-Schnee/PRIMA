@@ -74,24 +74,6 @@
     "ƒ.Graph": {
       "name": "Root",
       "components": {
-        "ComponentAudio": [
-          {
-            "ƒ.ComponentAudio": {
-              "active": true,
-              "idResource": "Audio|2021-11-09T14:25:30.581Z|04392",
-              "playing": true,
-              "loop": true,
-              "volume": 1
-            }
-          }
-        ],
-        "ComponentAudioListener": [
-          {
-            "ƒ.ComponentAudioListener": {
-              "active": true
-            }
-          }
-        ]
       },
       "children": [
         {
