@@ -1,32 +1,36 @@
 namespace Script {
   import ƒ = FudgeCore;
   ƒ.Debug.info("Main Program Template running!")
-
-  let viewport: ƒ.Viewport;
   document.addEventListener("interactiveViewportStarted", <any>start);
 
+  let viewport: ƒ.Viewport;
+  
   let laserformation: ƒ.Node;
   let agent: Agent;
-
+  
+  let hitted: boolean = false;
+  
   let ctrForward: ƒ.Control = new ƒ.Control("Forward", 10, ƒ.CONTROL_TYPE.PROPORTIONAL);
   ctrForward.setDelay(200);
-
+  
   let ctrRotate: ƒ.Control = new ƒ.Control("Rotate", 90, ƒ.CONTROL_TYPE.PROPORTIONAL)
   ctrRotate.setDelay(0);
-
+  
   async function start(_event: CustomEvent): Promise<void> {
     viewport = _event.detail;
-
-
-
+    
     let graph: ƒ.Node = viewport.getBranch();
     laserformation = graph.getChildrenByName("Laserformation")[0];
-
+    
     agent = new Agent();
     graph.getChildrenByName("Agents")[0].addChild(agent);
-
+    document.addEventListener("click", hndClick)
+    document.addEventListener("agentSentEvent", hndAgentEvent)
+    
     viewport.camera.mtxPivot.translateZ(-16);
-    graph.addComponent(new ƒ.ComponentAudioListener());
+    let cmpListener = new ƒ.ComponentAudioListener();
+    graph.addComponent(cmpListener);
+
 
     let graphLaser: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:07:23.830Z|93008"];
 
@@ -38,8 +42,6 @@ namespace Script {
         laserarr.mtxLocal.translateX(-11 + j * 6);
       }
     }
-
-
     Hud.start();
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
@@ -60,20 +62,24 @@ namespace Script {
       + ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])
     );
 
-      if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ENTER]))
-        agent.playMusic();
-
     ctrRotate.setInput(rotValue * deltaTime)
     agent.mtxLocal.rotateZ(ctrRotate.getOutput())
     // ƒ.Physics.world.simulate();  // if physics is included and used
     viewport.draw();
     //console.log(Laser.collision(agent, laserformation))
-    if (Laser.collision(agent, laserformation))
-      console.log("hit");
+    hitted = Laser.collision(agent, laserformation);
+    agent.playMusic(hitted);
     ƒ.AudioManager.default.update();
 
-    
     agent.healthvalue -= 0.01;
     agent.health();
+  }
+
+  function hndClick(_event: MouseEvent): void{
+    console.log("click");
+    agent.dispatchEvent(new CustomEvent("AgentSentEvent"));
+  }
+  function hndAgentEvent(_event: Event): void{
+    console.log("event dispatched");
   }
 }

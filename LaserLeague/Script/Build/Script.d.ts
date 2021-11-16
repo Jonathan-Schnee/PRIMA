@@ -4,9 +4,10 @@ declare namespace Script {
         healthvalue: number;
         name: string;
         private cmpAudio;
+        private hit;
         constructor();
         health(): void;
-        playMusic(): void;
+        playMusic(bol: boolean): void;
     }
 }
 declare namespace Script {

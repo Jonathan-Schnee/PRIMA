@@ -6,8 +6,10 @@ var Script;
         healthvalue = 1;
         name = "Agent Smith";
         cmpAudio;
+        hit;
         constructor() {
             super("Agent");
+            this.hit = false;
             this.addComponent(new ƒ.ComponentTransform);
             this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshPyramid("MeshAgent")));
             this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("MaterialAgent", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(1, 0, 1, 1)))));
@@ -18,18 +20,18 @@ var Script;
             css.style.width = this.name.length - 1 + "ch";
             const audio = new ƒ.Audio("Sound/trancyvania.mp3");
             this.cmpAudio = new ƒ.ComponentAudio(audio, true);
-            this.cmpAudio.volume = 0.1;
+            this.cmpAudio.volume = 1;
             this.addComponent(this.cmpAudio);
-            this.addComponent(new ƒ.ComponentAudioListener());
         }
         health() {
             Script.gameState.health = this.healthvalue;
         }
-        playMusic() {
-            if (this.cmpAudio.isPlaying)
-                this.cmpAudio.play(false);
-            else
-                this.cmpAudio.play(true);
+        playMusic(bol) {
+            if (bol != this.hit) {
+                this.hit = bol;
+                console.log(this.hit);
+                this.cmpAudio.play(this.hit);
+            }
         }
     }
     Script.Agent = Agent;
@@ -154,10 +156,11 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
-    let viewport;
     document.addEventListener("interactiveViewportStarted", start);
+    let viewport;
     let laserformation;
     let agent;
+    let hitted = false;
     let ctrForward = new ƒ.Control("Forward", 10, 0 /* PROPORTIONAL */);
     ctrForward.setDelay(200);
     let ctrRotate = new ƒ.Control("Rotate", 90, 0 /* PROPORTIONAL */);
@@ -168,8 +171,11 @@ var Script;
         laserformation = graph.getChildrenByName("Laserformation")[0];
         agent = new Script.Agent();
         graph.getChildrenByName("Agents")[0].addChild(agent);
+        document.addEventListener("click", hndClick);
+        document.addEventListener("agentSentEvent", hndAgentEvent);
         viewport.camera.mtxPivot.translateZ(-16);
-        graph.addComponent(new ƒ.ComponentAudioListener());
+        let cmpListener = new ƒ.ComponentAudioListener();
+        graph.addComponent(cmpListener);
         let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:07:23.830Z|93008"];
         for (var i = 0; i < 2; i++) {
             for (var j = 0; j < 3; j++) {
@@ -191,18 +197,23 @@ var Script;
         agent.mtxLocal.translateY(ctrForward.getOutput());
         let rotValue = (ƒ.Keyboard.mapToValue(1, 0, [ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])
             + ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
-        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ENTER]))
-            agent.playMusic();
         ctrRotate.setInput(rotValue * deltaTime);
         agent.mtxLocal.rotateZ(ctrRotate.getOutput());
         // ƒ.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
         //console.log(Laser.collision(agent, laserformation))
-        if (Script.Laser.collision(agent, laserformation))
-            console.log("hit");
+        hitted = Script.Laser.collision(agent, laserformation);
+        agent.playMusic(hitted);
         ƒ.AudioManager.default.update();
         agent.healthvalue -= 0.01;
         agent.health();
+    }
+    function hndClick(_event) {
+        console.log("click");
+        agent.dispatchEvent(new CustomEvent("AgentSentEvent"));
+    }
+    function hndAgentEvent(_event) {
+        console.log("event dispatched");
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map
