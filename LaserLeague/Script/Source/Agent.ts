@@ -33,8 +33,8 @@ namespace Script {
         public playMusic(bol: boolean): void{
             if(bol!=this.hit){
                 this.hit = bol
-                console.log(this.hit)
-                this.cmpAudio.play(this.hit);
+                //console.log(this.hit)
+                //this.cmpAudio.play(this.hit);
             }
         }
     }

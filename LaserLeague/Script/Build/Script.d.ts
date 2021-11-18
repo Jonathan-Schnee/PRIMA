@@ -49,6 +49,7 @@ declare namespace Script {
         start(): void;
         update: (_event: Event) => void;
         static collision(agent: Agent, laserformation: ƒ.Node): boolean;
+        changeRotateSpeed(num: number): void;
     }
 }
 declare namespace Script {

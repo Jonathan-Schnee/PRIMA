@@ -73,5 +73,8 @@ namespace Script {
       //   // delete properties that should not be mutated
       //   // undefined properties and private fields (#) will not be included by default
       // }
-    }
+      public changeRotateSpeed(num: number): void{
+        this.rotationSpeed = num;
+      }
+    }   
   }
