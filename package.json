@@ -1,0 +1,18 @@
+{
+  "name": "prima",
+  "version": "1.0.0",
+  "description": "FUDGE_Server starts on Heroku using this package.json",
+  "main": "",
+  "scripts": {
+    "start": "node Server/Server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jonathan-Schnee/PRIMA.git"
+  },
+  "author": "John Schnee",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16.11.7"
+  }
+}
