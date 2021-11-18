@@ -13,9 +13,9 @@
   "author": "John Schnee",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^16.11.7"
+    "@types/node": "^16.11.7",
     "webrtc-adapter": "^8.1.0",
-    "websocket": "^1.0.32",
-    "ws": "^7.5.5"
+    "websocket": "^1.0.34",
+    "ws": "^8.2.3"
   }
 }
