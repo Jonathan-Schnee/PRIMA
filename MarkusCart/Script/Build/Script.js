@@ -39,32 +39,56 @@ var Script;
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
     let map = new ƒ.Node("ownTarrain");
+    let ctrForward = new ƒ.Control("Forward", 10, 0 /* PROPORTIONAL */);
+    ctrForward.setDelay(50000);
+    let ctrTurn = new ƒ.Control("Turn", 100, 0 /* PROPORTIONAL */);
+    ctrForward.setDelay(50);
+    let cart;
+    let mtxTerrain;
+    let meshTerrain;
     async function start(_event) {
         viewport = _event.detail;
+        viewport.calculateTransforms();
+        viewport.camera.mtxPivot.translateY(120);
+        viewport.camera.mtxPivot.rotateX(90);
         let graph = viewport.getBranch();
-        let cmpRigidbody = new ƒ.ComponentRigidbody(1, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE);
+        cart = graph.getChildrenByName("Cart")[0];
+        //let cmpRigidbody: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE);
         let heightMap = new ƒ.TextureImage();
         await heightMap.load("../Texture/heightC.png");
-        let mtrTexFlat = ƒ.Project.resources["Material|2021-11-23T02:36:34.207Z|12139"];
-        let material = new ƒ.ComponentMaterial(mtrTexFlat);
+        let mtrTex = ƒ.Project.resources["Material|2021-11-23T14:02:06.634Z|31225"];
+        let material = new ƒ.ComponentMaterial(mtrTex);
+        console.log(material);
         let gridMeshFlat = new ƒ.MeshRelief("HeightMap", heightMap);
         let grid = new ƒ.ComponentMesh(gridMeshFlat);
-        console.log(grid);
         grid.mtxPivot.scale(new ƒ.Vector3(100, 10, 100));
-        grid.mtxPivot.translateY(-grid.mesh.boundingBox.max.y);
+        grid.mtxPivot.translateY(-grid.mesh.boundingBox.max.y / 2);
         let transfom = new ƒ.ComponentTransform();
         map.addComponent(grid);
         map.addComponent(material);
-        map.addComponent(cmpRigidbody);
+        //map.addComponent(cmpRigidbody)
         map.addComponent(transfom);
         graph.addChild(map);
+        meshTerrain = map.getComponent(ƒ.ComponentMesh).mesh;
+        mtxTerrain = map.getComponent(ƒ.ComponentMesh).mtxWorld;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60);
     }
     function update(_event) {
-        console.log();
         // ƒ.Physics.world.simulate();  // if physics is included and used
-        ƒ.Physics.world.simulate();
+        //ƒ.Physics.world.simulate();
+        let deltaTime = ƒ.Loop.timeFrameReal / 1000;
+        let forward = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]);
+        ctrForward.setInput(forward);
+        cart.mtxLocal.translateZ(ctrForward.getOutput() * deltaTime);
+        if (forward != 0) {
+            let turn = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]);
+            ctrTurn.setInput(turn);
+            cart.mtxLocal.rotateY(ctrTurn.getOutput() * deltaTime);
+        }
+        let terrainInfo = meshTerrain.getTerrainInfo(cart.mtxLocal.translation, mtxTerrain);
+        cart.mtxLocal.translation = terrainInfo.position;
+        cart.mtxLocal.showTo(ƒ.Vector3.SUM(terrainInfo.position, cart.mtxLocal.getZ()), terrainInfo.normal);
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
