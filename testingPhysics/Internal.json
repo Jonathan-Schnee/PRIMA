@@ -171,9 +171,9 @@
                     "dampTranslation": 0.1,
                     "dampRotation": 0.1,
                     "effectGravity": 1,
-                    "typeBody": "DYNAMIC",
+                    "typeBody": "KINEMATIC",
                     "typeCollider": "CUBE",
-                    "isTrigger": false,
+                    "isTrigger": true,
                     "id": 2,
                     "pivot": {
                       "translation": "[0, 0, 0]",

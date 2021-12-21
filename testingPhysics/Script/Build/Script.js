@@ -48,8 +48,8 @@ var Script;
         agent = graph.getChildrenByName("Agent")[0];
         coll = graph.getChildrenByName("Collider")[0];
         viewport = _event.detail;
-        coll.getComponent(ƒ.ComponentRigidbody).isTrigger = false;
-        agent.getComponent(ƒ.ComponentRigidbody).addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, collider, true);
+        //coll.getComponent(ƒ.ComponentRigidbody).isTrigger = true;
+        agent.getComponent(ƒ.ComponentRigidbody).addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, (_event) => console.log("proximity"));
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60);
         // ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
