@@ -27,9 +27,8 @@ namespace Script {
     agentRB = agent.getComponent(ƒ.ComponentRigidbody);
     agentRB.effectRotation = new ƒ.Vector3(0,0,0);
     agentdampT = agentRB.dampTranslation
-
     
-    cmpCamera.mtxPivot.translation = new ƒ.Vector3(0, 0, 20);
+    cmpCamera.mtxPivot.translation = new ƒ.Vector3(0, 0, 22);
     cmpCamera.mtxPivot.rotation = new ƒ.Vector3(0, 180, 0);
 
     cameraNode.addComponent(cmpCamera);
@@ -45,7 +44,7 @@ namespace Script {
 
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
-    ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+    ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
 
   function update(_event: Event): void {
@@ -70,7 +69,7 @@ namespace Script {
 
 
     if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && isGrounded){
-      agentRB.addVelocity(ƒ.Vector3.Y(10))
+      agentRB.setVelocity(new ƒ.Vector3(agentRB.getVelocity().x, 11, agentRB.getVelocity().z))
     }
 
     ƒ.Physics.world.simulate();  // if physics is included and used
