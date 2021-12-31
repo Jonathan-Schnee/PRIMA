@@ -37,35 +37,48 @@ var Script;
     var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
     let viewport;
-    document.addEventListener("interactiveViewportStarted", start);
-    let ctrForward = new ƒ.Control("Forward", 550, 0 /* PROPORTIONAL */);
+    let ctrForward = new ƒ.Control("Forward", 200, 0 /* PROPORTIONAL */);
     ctrForward.setDelay(10);
     let agent;
     let agentRB;
     let isGrounded;
     let ground;
     let agentdampT;
-    function start(_event) {
-        viewport = _event.detail;
-        viewport.physicsDebugMode = ƒ.PHYSICS_DEBUGMODE.COLLIDERS;
-        let graph = viewport.getBranch();
+    let graph;
+    let cameraNode = new ƒ.Node("cameraNode");
+    let cmpCamera = new ƒ.ComponentCamera();
+    window.addEventListener("load", start);
+    async function start(_event) {
+        await ƒ.Project.loadResourcesFromHTML();
+        graph = ƒ.Project.resources["Graph|2021-12-24T09:09:33.313Z|93679"];
         agent = graph.getChildrenByName("Agent")[0];
         ground = graph.getChildrenByName("Ground")[0];
         generateCG(ground);
         agentRB = agent.getComponent(ƒ.ComponentRigidbody);
         agentRB.effectRotation = new ƒ.Vector3(0, 0, 0);
         agentdampT = agentRB.dampTranslation;
+        cmpCamera.mtxPivot.translation = new ƒ.Vector3(0, 0, 20);
+        cmpCamera.mtxPivot.rotation = new ƒ.Vector3(0, 180, 0);
+        cameraNode.addComponent(cmpCamera);
+        cameraNode.addComponent(new ƒ.ComponentTransform());
+        graph.addChild(cameraNode);
+        let canvas = document.querySelector("canvas");
+        viewport = new ƒ.Viewport();
+        viewport.initialize("Viewport", graph, cmpCamera, canvas);
+        ƒ.AudioManager.default.listenTo(graph);
+        ƒ.AudioManager.default.listenWith(graph.getComponent(ƒ.ComponentAudioListener));
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
+        cameraNode.mtxLocal.translation = new ƒ.Vector3(agent.mtxLocal.translation.x, 0, 0);
         isGrounded = false;
         let direction = ƒ.Vector3.Y(-1);
         let agentTransL = agent.mtxWorld.translation.clone;
-        agentTransL.x -= agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 - 0.01;
+        agentTransL.x -= agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 - 0.02;
         let rayL = ƒ.Physics.raycast(agentTransL, direction, 0.5, true, ƒ.COLLISION_GROUP.GROUP_2);
         let agentTransR = agent.mtxWorld.translation.clone;
-        agentTransR.x += agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 - 0.01;
+        agentTransR.x += agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 - 0.02;
         let rayR = ƒ.Physics.raycast(agentTransR, direction, 0.5, true, ƒ.COLLISION_GROUP.GROUP_2);
         if (rayL.hit || rayR.hit) {
             agentRB.dampTranslation = agentdampT;
@@ -75,8 +88,6 @@ var Script;
         ctrForward.setInput(forward);
         agentRB.applyForce(ƒ.Vector3.X(ctrForward.getOutput()));
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && isGrounded) {
-            //agentRB.applyLinearImpulse(ƒ.Vector3.Y(15));
-            agentRB.dampTranslation = 0.1;
             agentRB.addVelocity(ƒ.Vector3.Y(10));
         }
         ƒ.Physics.world.simulate(); // if physics is included and used
