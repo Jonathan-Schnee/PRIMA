@@ -4,7 +4,7 @@ namespace Script {
 
   let viewport: ƒ.Viewport;
 
-  let ctrForward: ƒ.Control = new ƒ.Control("Forward", 200, ƒ.CONTROL_TYPE.PROPORTIONAL);
+  let ctrForward: ƒ.Control = new ƒ.Control("Forward", 250, ƒ.CONTROL_TYPE.PROPORTIONAL);
   ctrForward.setDelay(10);
 
   let agent: ƒ.Node;
@@ -13,23 +13,47 @@ namespace Script {
   let ground: ƒ.Node;
   let agentdampT: number;
   let graph: ƒ.Graph;
+  let treeList: ƒ.Node;
+  let stoneList: ƒ.Node;
+  let randomSeed: number;
+  let random :ƒ.Random;
+  let generator : ƒ.Node;
   
   let cameraNode: ƒ.Node = new ƒ.Node("cameraNode");
   let cmpCamera = new ƒ.ComponentCamera();
 
   window.addEventListener("load", <any>start);
+
   async function start(_event: CustomEvent): Promise<void> {
     await ƒ.Project.loadResourcesFromHTML();
     graph = <ƒ.Graph>ƒ.Project.resources["Graph|2021-12-24T09:09:33.313Z|93679"];
+
+    randomSeed = 30;
+    random = new ƒ.Random(randomSeed);
+
     agent= graph.getChildrenByName("Agent")[0];
+    agent.getComponent(ScriptAgent).setRB();
+    window.addEventListener("click", agent.getComponent(ScriptAgent).use);
+
+    
     ground = graph.getChildrenByName("Ground")[0];
+
+    generator = graph.getChildrenByName("Generator")[0];
+    generator.getComponent(ScriptGenerator).addTree(random);
+    generator.getComponent(ScriptGenerator).addStone(random);
+    
+
+    treeList = generator.getChildrenByName("Trees")[0];
+
+    stoneList = generator.getChildrenByName("Stones")[0];
+
     generateCG(ground)
     agentRB = agent.getComponent(ƒ.ComponentRigidbody);
     agentRB.effectRotation = new ƒ.Vector3(0,0,0);
     agentdampT = agentRB.dampTranslation
     
-    cmpCamera.mtxPivot.translation = new ƒ.Vector3(0, 0, 22);
-    cmpCamera.mtxPivot.rotation = new ƒ.Vector3(0, 180, 0);
+    cmpCamera.mtxPivot.translation = new ƒ.Vector3(0, 1, 20);
+    cmpCamera.mtxPivot.rotation = new ƒ.Vector3(5, 180, 0);
 
     cameraNode.addComponent(cmpCamera);
     cameraNode.addComponent(new ƒ.ComponentTransform());
@@ -38,6 +62,8 @@ namespace Script {
     let canvas: HTMLCanvasElement = document.querySelector("canvas");
     viewport = new ƒ.Viewport();
     viewport.initialize("Viewport", graph, cmpCamera, canvas);
+
+    viewport.physicsDebugMode = ƒ.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
 
     ƒ.AudioManager.default.listenTo(graph);
     ƒ.AudioManager.default.listenWith(graph.getComponent(ƒ.ComponentAudioListener));
@@ -51,7 +77,8 @@ namespace Script {
     cameraNode.mtxLocal.translation = new ƒ.Vector3(agent.mtxLocal.translation.x, 0, 0)
     isGrounded = false
     let direction = ƒ.Vector3.Y(-1)
-
+    treeList.getChildrenByName("Tree3")[0].mtxLocal.rotateX(-90);
+    console.log(treeList.getChildrenByName("Tree3")[0].mtxLocal.translation.y);
     let agentTransL = agent.mtxWorld.translation.clone;
     agentTransL.x -= agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x /2 - 0.02;
     let rayL = ƒ.Physics.raycast(agentTransL, direction, 0.5, true, ƒ.COLLISION_GROUP.GROUP_2)
@@ -67,11 +94,9 @@ namespace Script {
     ctrForward.setInput(forward);
     agentRB.applyForce(ƒ.Vector3.X(ctrForward.getOutput()));
 
-
     if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && isGrounded){
       agentRB.setVelocity(new ƒ.Vector3(agentRB.getVelocity().x, 11, agentRB.getVelocity().z))
     }
-
     ƒ.Physics.world.simulate();  // if physics is included and used
     viewport.draw();
     ƒ.AudioManager.default.update();
