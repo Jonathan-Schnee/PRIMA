@@ -59,7 +59,7 @@ var Script;
         randomSeed = 30;
         random = new ƒ.Random(randomSeed);
         agent = graph.getChildrenByName("Agent")[0];
-        agent.getComponent(Script.ScriptAgent).setRB();
+        agent.getComponent(Script.ScriptAgent).getRB();
         window.addEventListener("click", agent.getComponent(Script.ScriptAgent).use);
         ground = graph.getChildrenByName("Ground")[0];
         generator = graph.getChildrenByName("Generator")[0];
@@ -89,8 +89,6 @@ var Script;
         cameraNode.mtxLocal.translation = new ƒ.Vector3(agent.mtxLocal.translation.x, 0, 0);
         isGrounded = false;
         let direction = ƒ.Vector3.Y(-1);
-        treeList.getChildrenByName("Tree3")[0].mtxLocal.rotateX(-90);
-        console.log(treeList.getChildrenByName("Tree3")[0].mtxLocal.translation.y);
         let agentTransL = agent.mtxWorld.translation.clone;
         agentTransL.x -= agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 - 0.02;
         let rayL = ƒ.Physics.raycast(agentTransL, direction, 0.5, true, ƒ.COLLISION_GROUP.GROUP_2);
@@ -152,41 +150,42 @@ var Script;
         };
         use = (_event) => {
             let tree;
+            let treeRB;
             if (this.agentRB.triggerings.length != 0) {
                 for (let rb of this.agentRB.triggerings) {
                     if (rb.collisionGroup == ƒ.COLLISION_GROUP.GROUP_3) {
-                        tree = rb.node;
+                        tree = rb.node.getParent();
+                        treeRB = rb;
+                        console.log(tree);
                         break;
                     }
                 }
-            }
-            if (this.item == "Axe") {
-                //Call Trigger from Tree and call the Method in the ScriptTree
-                console.log("hit2");
-                let treemesh = tree.getComponent(ƒ.ComponentMesh);
-                let treeheight = treemesh.mtxPivot.scaling.clone;
-                treemesh.mtxPivot.scaling = new ƒ.Vector3(treeheight.x, treeheight.y - 1, treeheight.z);
-                console.log(tree.mtxLocal.translation.toString());
-                ƒ.Recycler.dumpAll();
-                tree.mtxLocal.translation = new ƒ.Vector3(1, 1, 1);
-                tree.mtxLocal.translation = new ƒ.Vector3(1, 1, 1);
-                tree.mtxLocal.translation = new ƒ.Vector3(1, 1, 1);
-                console.log(tree.mtxLocal.translation.toString());
-                console.log(tree.mtxLocal.translation.toString());
-                console.log(tree.mtxLocal.translation.toString());
-            }
-            if (this.item == "Pickaxe") {
-                //Call Trigger from Tree and call the Method in the ScriptTree
-                console.log("hit2");
-            }
-            if (this.item == "Sword") {
-                //Call Trigger from Tree and call the Method in the ScriptTree
-                console.log("hit3");
+                if (this.item == "Axe") {
+                    //Call Trigger from Tree and call the Method in the ScriptTree
+                    console.log("hit2");
+                    let treemesh = tree.getComponent(ƒ.ComponentMesh);
+                    let treeheight = treemesh.mtxPivot.scaling.clone;
+                    treemesh.mtxPivot.scaling = new ƒ.Vector3(treeheight.x, treeheight.y - 1, treeheight.z);
+                    tree.mtxLocal.translateY(-0.5);
+                    treeRB.node.mtxLocal.translateY(0.5);
+                    if (treemesh.mtxPivot.scaling.y == 0) {
+                        console.log("test");
+                        treeRB.node.removeComponent(treeRB);
+                        tree.getParent().removeChild(tree);
+                    }
+                }
+                if (this.item == "Pickaxe") {
+                    //Call Trigger from Tree and call the Method in the ScriptTree
+                    console.log("hit2");
+                }
+                if (this.item == "Sword") {
+                    //Call Trigger from Tree and call the Method in the ScriptTree
+                    console.log("hit3");
+                }
             }
         };
-        setRB() {
+        getRB() {
             this.agentRB = this.node.getComponent(ƒ.ComponentRigidbody);
-            console.log(this.node.getComponent(ƒ.ComponentRigidbody));
         }
     }
     Script.ScriptAgent = ScriptAgent;
@@ -219,9 +218,12 @@ var Script;
                     tree.getComponent(ƒ.ComponentMesh).mtxPivot.scaleY(height / scale.y);
                     tree.mtxLocal.translateY((height - scale.y) / 2);
                     tree.addComponent(new Script.ScriptTree);
-                    tree.addComponent(new ƒ.ComponentRigidbody);
-                    let treeRB = tree.getComponent(ƒ.ComponentRigidbody);
-                    treeRB.typeBody = ƒ.BODY_TYPE.STATIC;
+                    let placeholderRB = new ƒ.Node("placeholderRB");
+                    tree.appendChild(placeholderRB);
+                    placeholderRB.addComponent(new ƒ.ComponentTransform);
+                    placeholderRB.addComponent(new ƒ.ComponentRigidbody);
+                    let treeRB = placeholderRB.getComponent(ƒ.ComponentRigidbody);
+                    treeRB.typeBody = ƒ.BODY_TYPE.KINEMATIC;
                     treeRB.initialization = ƒ.BODY_INIT.TO_PIVOT;
                     treeRB.isTrigger = true;
                     treeRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_3;

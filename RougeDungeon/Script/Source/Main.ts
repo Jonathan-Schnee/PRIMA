@@ -16,9 +16,9 @@ namespace Script {
   let treeList: ƒ.Node;
   let stoneList: ƒ.Node;
   let randomSeed: number;
-  let random :ƒ.Random;
-  let generator : ƒ.Node;
-  
+  let random: ƒ.Random;
+  let generator: ƒ.Node;
+
   let cameraNode: ƒ.Node = new ƒ.Node("cameraNode");
   let cmpCamera = new ƒ.ComponentCamera();
 
@@ -31,17 +31,17 @@ namespace Script {
     randomSeed = 30;
     random = new ƒ.Random(randomSeed);
 
-    agent= graph.getChildrenByName("Agent")[0];
-    agent.getComponent(ScriptAgent).setRB();
+    agent = graph.getChildrenByName("Agent")[0];
+    agent.getComponent(ScriptAgent).getRB();
     window.addEventListener("click", agent.getComponent(ScriptAgent).use);
 
-    
+
     ground = graph.getChildrenByName("Ground")[0];
 
     generator = graph.getChildrenByName("Generator")[0];
     generator.getComponent(ScriptGenerator).addTree(random);
     generator.getComponent(ScriptGenerator).addStone(random);
-    
+
 
     treeList = generator.getChildrenByName("Trees")[0];
 
@@ -49,9 +49,9 @@ namespace Script {
 
     generateCG(ground)
     agentRB = agent.getComponent(ƒ.ComponentRigidbody);
-    agentRB.effectRotation = new ƒ.Vector3(0,0,0);
+    agentRB.effectRotation = new ƒ.Vector3(0, 0, 0);
     agentdampT = agentRB.dampTranslation
-    
+
     cmpCamera.mtxPivot.translation = new ƒ.Vector3(0, 1, 20);
     cmpCamera.mtxPivot.rotation = new ƒ.Vector3(5, 180, 0);
 
@@ -77,24 +77,22 @@ namespace Script {
     cameraNode.mtxLocal.translation = new ƒ.Vector3(agent.mtxLocal.translation.x, 0, 0)
     isGrounded = false
     let direction = ƒ.Vector3.Y(-1)
-    treeList.getChildrenByName("Tree3")[0].mtxLocal.rotateX(-90);
-    console.log(treeList.getChildrenByName("Tree3")[0].mtxLocal.translation.y);
     let agentTransL = agent.mtxWorld.translation.clone;
-    agentTransL.x -= agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x /2 - 0.02;
+    agentTransL.x -= agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 - 0.02;
     let rayL = ƒ.Physics.raycast(agentTransL, direction, 0.5, true, ƒ.COLLISION_GROUP.GROUP_2)
     let agentTransR = agent.mtxWorld.translation.clone;
-    agentTransR.x += agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x /2 - 0.02;
+    agentTransR.x += agent.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 - 0.02;
     let rayR = ƒ.Physics.raycast(agentTransR, direction, 0.5, true, ƒ.COLLISION_GROUP.GROUP_2)
-    if(rayL.hit || rayR.hit){
+    if (rayL.hit || rayR.hit) {
       agentRB.dampTranslation = agentdampT;
       isGrounded = true
     }
 
-    let forward: number = ƒ.Keyboard.mapToTrit( [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT], [ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]);
+    let forward: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT], [ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]);
     ctrForward.setInput(forward);
     agentRB.applyForce(ƒ.Vector3.X(ctrForward.getOutput()));
 
-    if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && isGrounded){
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && isGrounded) {
       agentRB.setVelocity(new ƒ.Vector3(agentRB.getVelocity().x, 11, agentRB.getVelocity().z))
     }
     ƒ.Physics.world.simulate();  // if physics is included and used
@@ -102,8 +100,8 @@ namespace Script {
     ƒ.AudioManager.default.update();
   }
 
-  function generateCG(ground: ƒ.Node){
-    for(let g of ground.getChildren()){
+  function generateCG(ground: ƒ.Node) {
+    for (let g of ground.getChildren()) {
       let groundRB = g.getComponent(ƒ.ComponentRigidbody)
       groundRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_2
     }

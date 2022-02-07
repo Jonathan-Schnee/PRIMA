@@ -19,7 +19,7 @@ declare namespace Script {
         constructor();
         hndEvent: (_event: Event) => void;
         use: (_event: Event) => void;
-        setRB(): void;
+        getRB(): void;
     }
 }
 declare namespace Script {
